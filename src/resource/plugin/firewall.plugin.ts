@@ -11,7 +11,7 @@ export default {
         }> } | { success: false, error?: Error } => {
             try {
                 if(fs.existsSync(path.resolve(process.env.XDP_CONFIG_PATH, './xdpfw.conf')) == false) return { success: false, error: new Error('Failed to fetch xdp firewall configuration file.') }
-                const _rawConfiguration = fs.readFileSync(path.resolve(process.env.BIRD_CONFIG_PATH, './xdpfw.conf'), 'utf-8')
+                const _rawConfiguration = fs.readFileSync(path.resolve(process.env.XDP_CONFIG_PATH, './xdpfw.conf'), 'utf-8')
                 const _rules = _rawConfiguration.match(/\{ enabled = (true|false), action = (0|1)(, (src_ip|src_ip6|dst_ip|dst_ip6) = \"[^"]*\"){0,4}(, (bps|pps) = [0-9]+){0,2}(, tcp_enabled = true(, (tcp_sport|tcp_dport) = [0-9]+){0,2}?(, (tcp_syn|tcp_ack|tcp_rst|tcp_psh|tcp_urg|tcp_fin|tcp_ece|tcp_cwr) = (true|false)){0,8})?(, udp_enabled = true(, (udp_sport|udp_dport) = [0-9]+){0,2})? \} +\# [^ ]+/g)
                 return { success: true, rules: _rules.map(_rule => {
                     return {
@@ -34,8 +34,8 @@ export default {
         deleteRule: (_id: string): { success: true } | { success: false, error?: Error } => {
             try {
                 if(fs.existsSync(path.resolve(process.env.XDP_CONFIG_PATH, './xdpfw.conf')) == false) return { success: false, error: new Error('Failed to fetch xdp firewall configuration file.') }
-                const _rawConfiguration = fs.readFileSync(path.resolve(process.env.BIRD_CONFIG_PATH, './xdpfw.conf'), 'utf-8')
-                fs.writeFileSync(path.resolve(process.env.BIRD_CONFIG_PATH, './xdpfw.conf'), _rawConfiguration.split('\n').filter(_rule => _rule.includes(_id) == false).join('\n'), 'utf-8')
+                const _rawConfiguration = fs.readFileSync(path.resolve(process.env.XDP_CONFIG_PATH, './xdpfw.conf'), 'utf-8')
+                fs.writeFileSync(path.resolve(process.env.XDP_CONFIG_PATH, './xdpfw.conf'), _rawConfiguration.split('\n').filter(_rule => _rule.includes(_id) == false).join('\n'), 'utf-8')
                 return { success: true }
             } catch(_error) { return _error instanceof Error ? { success: false, error: new Error('An unknown error has occured', { cause: _error }) } : (typeof _error == 'string' ? { success: false, error: new Error(_error) } : { success: false, error: new Error('An unknown error has occured.') }) }
         },
@@ -47,7 +47,7 @@ export default {
         ): { success: true } | { success: false, error?: Error } => {
             try {
                 if(fs.existsSync(path.resolve(process.env.XDP_CONFIG_PATH, './xdpfw.conf')) == false) return { success: false, error: new Error('Failed to fetch xdp firewall configuration file.') }
-                const _rawConfiguration = fs.readFileSync(path.resolve(process.env.BIRD_CONFIG_PATH, './xdpfw.conf'), 'utf-8')
+                const _rawConfiguration = fs.readFileSync(path.resolve(process.env.XDP_CONFIG_PATH, './xdpfw.conf'), 'utf-8')
                 const _SRZ = _rawConfiguration.match(/ +\# LUNA-NETWORKS-SRZ/)
                 if(_SRZ == null) return { success: false, error: new Error('SRZ setup is required.') }
                 const _source = (_filter.source ?? '').split(':')
