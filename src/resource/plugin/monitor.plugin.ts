@@ -11,7 +11,7 @@ export const _protocols: { [ protocolCode in string ]: string } = JSON.parse(fs.
 export default {
     PacketCapture: (_interface: string, _callback: (_parsedPacket: {
         issuedDate: Date,
-        flow: 'INBOUND' | 'OUTBOUND' | 'UNKNOWN',
+        flow: 'INBOUND' | 'OUTBOUND',
         id: string,
         protocol: number,
         protocolName: string,
@@ -42,7 +42,6 @@ export default {
             const _outboundTcpdump = child.spawn('tcpdump', ['-i', _interface, '-Q', 'out', '-n', '-vv'])
             // _xdpdump.stdout.pipe(_inboundTcpdump.stdin)
 
-            const _ipAddresses = os.networkInterfaces()[_interface].filter(_interface => _interface.internal == false).map(_interface => _interface.address)
             let _packetCache = ''
             function _flagParser (_flag: string): Array<'SYN' | 'FIN' | 'RST' | 'PSH' | 'URG' | 'ECE' | 'CWR' | 'NS' | 'ACK' | 'DONT_FRAGMENTS' | 'MORE_FRAGMENTS'> {
                 const _flagMap = {
@@ -61,7 +60,7 @@ export default {
                 const _parsedFlags = _flag.match(/\b\w+\b/g) || [  ]
                 return _parsedFlags.map((_flag: string) => _flagMap[_flag] || _flag)
             }
-            function _packetParser (_bufferData: Buffer) {
+            function _packetParser (_bufferData: Buffer, _flow: 'INBOUND' | 'OUTBOUND') {
                 const _packets: Array<string> = _bufferData.toString().replace(/\n +/gi, ' ').replace(/\n\t/gi, ' ').replace(/ +/gi, ' ').split('\n')
                 const _decodedPacket = _packets
                     .filter(_packet => _packet !== '' && _packet.includes('    ') == false)
@@ -75,7 +74,7 @@ export default {
                         const _mainIpAddresses = _decodedPacket[0].match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})? > \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/)[0]
                         return {
                             issuedDate: new Date(`${ dayjs().format('YYYY-MM-DD') } ${ _connectedPacket.split(' ')[0] }`),
-                            flow: _ipAddresses.includes(_mainIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}/g)[0]) ? 'OUTBOUND' : ( _ipAddresses.includes(_mainIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}/g)[1]) ? 'INBOUND' : 'UNKNOWN' ) as 'INBOUND' | 'OUTBOUND' | 'UNKNOWN',
+                            flow: _flow,
                             id: _decodedPacket[0].match(/id [\d]+/)[0].match(/[\d]+/)[0],
                             protocol: Number(_decodedPacket[0].match(/proto [A-Za-z0-9-]+ \([\d]+\)/)[0].match(/[\d]+/)[0]),
                             protocolName: _protocols[_decodedPacket[0].match(/proto [A-Za-z0-9-]+ \([\d]+\)/)[0].match(/[\d]+/)[0]],
@@ -106,8 +105,8 @@ export default {
                 for(const _packet of _decodedPacket) { _callback(_packet) }
                 _packetCache = _packets[_packets.length - 1]
             }
-            _inboundTcpdump.stdout.on('data', _packetParser)
-            _outboundTcpdump.stdout.on('data', _packetParser)
+            _inboundTcpdump.stdout.on('data', _data => _packetParser(_data, 'INBOUND'))
+            _outboundTcpdump.stdout.on('data', _data => _packetParser(_data, 'OUTBOUND'))
             return { success: true }
         } catch(_error) { return _error instanceof Error ? { success: false, error: new Error('An unknown error has occured', { cause: _error }) } : (typeof _error == 'string' ? { success: false, error: new Error(_error) } : { success: false, error: new Error('An unknown error has occured.') }) }
     },

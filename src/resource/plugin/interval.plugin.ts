@@ -86,30 +86,28 @@ export default {
                             }
                         }
                     }
-                    if(_rawPacket.flow !== 'UNKNOWN') {
-                        packet[_ipAddress][{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
-                        packet[_ipAddress][{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
+                    packet[_ipAddress][{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
+                    packet[_ipAddress][{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
 
-                        switch (_rawPacket.protocolName) {
-                            case 'TCP':
-                                packet[_ipAddress].record.tcp[{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
-                                packet[_ipAddress].record.tcp[{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
-                                for (const _flag of _packet.flags) {
-                                    switch (_flag) {
-                                        case 'ACK':
-                                            packet[_ipAddress].record.tcp.flags.ACK ++
-                                            break
-                                        case 'SYN':
-                                            packet[_ipAddress].record.tcp.flags.SYN ++
-                                            break
-                                    }
+                    switch (_rawPacket.protocolName) {
+                        case 'TCP':
+                            packet[_ipAddress].record.tcp[{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
+                            packet[_ipAddress].record.tcp[{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
+                            for (const _flag of _packet.flags) {
+                                switch (_flag) {
+                                    case 'ACK':
+                                        packet[_ipAddress].record.tcp.flags.ACK ++
+                                        break
+                                    case 'SYN':
+                                        packet[_ipAddress].record.tcp.flags.SYN ++
+                                        break
                                 }
-                                break
-                            case 'UDP':
-                                packet[_ipAddress].record.udp[{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
-                                packet[_ipAddress].record.udp[{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
-                                break
-                        }
+                            }
+                            break
+                        case 'UDP':
+                            packet[_ipAddress].record.udp[{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
+                            packet[_ipAddress].record.udp[{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
+                            break
                     }
                 } catch(_error) {
                     console.log(_error)
