@@ -98,7 +98,7 @@ export default {
                                     sourcePort: _subIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/g)[0].split('.').length == 5 ? Number(_subIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/g)[0].split('.')[4]) : undefined,
                                     destinationIpAddress: _subIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}/g)[1],
                                     destinationPort: _subIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/g)[1].split('.').length == 5 ? Number(_subIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/g)[1].split('.')[4]) : undefined,
-                                    flags: _flagParser(_packet.match(/Flags \[([^\]]+)\]/)[1].match(/[A-Za-z.]+/)[0]),
+                                    flags: _packet.match(/Flags \[([^\]]+)\]/) ? _flagParser(_packet.match(/Flags \[([^\]]+)\]/)[1].match(/[A-Za-z.]+/)[0]) : undefined,
                                 }
                             })
                         }
