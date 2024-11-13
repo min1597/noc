@@ -72,6 +72,7 @@ export default {
                         const _connectedPacket = _packet.split(' ').length <= 17 ? `${ _packetCache } ${ _packet }` : _packet
                         const _decodedPacket = _connectedPacket.match(/IP \(tos [A-Za-z0-9]+,(ECT\(0\),)? ttl [0-9]+, id [0-9]+, offset [0-9]+, flags \[[A-Za-z,]+\], proto [A-Za-z]+ \([0-9]+\), length [0-9]+\) \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})? > \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?: (\[[^\]]*\])?( )?[A-Za-z0-9]+(\,)? (Flags \[[^\]]*\])?(\[[[A-Za-z.]+\])?(\, cksum [A-Za-z0-9]+)?( \([^)]*\),)?( seq [\d]+(\:[\d]+)?,)?( ack [\d]+,)?( win [\d]+,)?( (options \[[A-Za-z0-9, ]+\])?)?([^*] )?(length \d+)?/gi)
                         const _mainIpAddresses = _decodedPacket[0].match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})? > \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/)[0]
+                        if(_decodedPacket.length !== 1) console.log(_decodedPacket)
                         return {
                             issuedDate: new Date(`${ dayjs().format('YYYY-MM-DD') } ${ _connectedPacket.split(' ')[0] }`),
                             flow: _flow,

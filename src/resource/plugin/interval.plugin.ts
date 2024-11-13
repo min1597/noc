@@ -55,9 +55,9 @@ export default {
                         _rawPacket.subpackets.length == 0
                             ? _rawPacket[{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]]
                             : _rawPacket.subpackets[_rawPacket.subpackets.length - 1][{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]]
-                    console.log(`${ _rawPacket.sourceIpAddress } -(${ _rawPacket.flow })-> ${ _rawPacket.destinationIpAddress }`)
-                    console.log(`[${ { 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow] }] ${ _rawPacket[{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]] }`)
-                    console.log(`subpacket ${ _rawPacket.subpackets.length !== 0 ? _rawPacket.subpackets[_rawPacket.subpackets.length - 1][{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]] : '' }`)
+                    // console.log(`${ _rawPacket.sourceIpAddress } -(${ _rawPacket.flow })-> ${ _rawPacket.destinationIpAddress }`)
+                    // console.log(`[${ { 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow] }] ${ _rawPacket[{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]] }`)
+                    // console.log(`subpacket ${ _rawPacket.subpackets.length !== 0 ? _rawPacket.subpackets[_rawPacket.subpackets.length - 1][{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]] : '' }`)
                     const _packet = 
                         _rawPacket.subpackets.length == 0
                             ? _rawPacket
