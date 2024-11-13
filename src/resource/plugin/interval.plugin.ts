@@ -168,7 +168,7 @@ export default {
 
                                 const _firewall = await getDatabaseClient().manager.save(_Firewall)
 
-                                firewallPlugin.XDP.addRule(_firewall.uuid, { destination: _firewall.destination_cidr }, {  }, 'DROP')
+                                console.log(firewallPlugin.XDP.addRule(_firewall.uuid, { destination: _firewall.destination_cidr }, {  }, 'DROP'))
 
                                 const _Attack = new Attack()
                                 _Attack.target_ip_address = _ipAddress
