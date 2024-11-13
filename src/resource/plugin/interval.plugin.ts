@@ -33,13 +33,22 @@ let packet: {
                 outboundPacket: number,
                 outboundTraffic: number
             }
+        },
+        flows: {
+            [ flow in string ]: {
+                flow: 'INBOUND' | 'OUTBOUND',
+                inboundPacket: number,
+                inboundTraffic: number,
+                outboundPacket: number,
+                outboundTraffic: number,
+            }
         }
     }
 } = {  }
 
 const attacks: {
     [ uuid in string ]: {
-        method: 'SYN_FLOOD' | 'ACK_FLOOD' | 'UDP_FLOOD' | 'HIGH_PPS' | 'UNKNOWN',
+        method: 'SYN_FLOOD' | 'ACK_FLOOD' | 'UDP_FLOOD' | 'HIGH_PPS' | 'FLOW_THRESHOLD' | 'UNKNOWN',
         target: string,
         startedDate: Date,
 
@@ -57,14 +66,11 @@ export default {
         try {
             monitorPlugin.PacketCapture('enp1s0', _rawPacket => {
                 try {
-                    const _ipAddress =
-                        _rawPacket.protocolName == 'ICMP' || _rawPacket.subpackets.length == 0
-                            ? _rawPacket[{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]]
-                            : _rawPacket.subpackets[_rawPacket.subpackets.length - 1][{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]]
                     const _packet = 
-                        _rawPacket.subpackets.length == 0
+                        _rawPacket.protocolName == 'ICMP' || _rawPacket.subpackets.length == 0
                             ? _rawPacket
                             : _rawPacket.subpackets[_rawPacket.subpackets.length - 1]
+                    const _ipAddress = _packet[{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]]
 
                     if(packet[_ipAddress] == undefined) {
                         packet[_ipAddress] = {
@@ -95,11 +101,26 @@ export default {
                                     outboundPacket: 0,
                                     outboundTraffic: 0
                                 }
-                            }
+                            },
+                            flows: {  }
                         }
                     }
+                    const _flowName = `${ _packet.sourceIpAddress }${ [ 'TCP', 'UDP' ].includes(_packet.protocolName) ? `:${ _packet.sourcePort }` : '' }>${ _packet.protocolName }>${ _packet.destinationIpAddress }${ [ 'TCP', 'UDP' ].includes(_packet.protocolName) ? `:${ _packet.destinationPort }` : '' }`
+                    if(packet[_ipAddress].flows[_flowName] == undefined) {
+                        packet[_ipAddress].flows[_flowName] = {
+                            flow: _rawPacket.flow,
+                            inboundPacket: 0,
+                            inboundTraffic: 0,
+                            outboundPacket: 0,
+                            outboundTraffic: 0
+                        }
+                    }
+
                     packet[_ipAddress][{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
                     packet[_ipAddress][{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
+
+                    packet[_ipAddress].flows[_flowName][{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
+                    packet[_ipAddress].flows[_flowName][{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
 
                     switch (_rawPacket.protocolName) {
                         case 'TCP':
@@ -131,7 +152,33 @@ export default {
             })
             setInterval(async () => {
                 try {
-                    console.log(JSON.stringify(packet))
+                    for (const _ipAddress of Object.keys(packet)) {
+                        if(Object.values(attacks).filter(_attack => _attack.method == 'FLOW_THRESHOLD' && _attack.target == _ipAddress).length == 0) {
+                            if(Object.values(packet[_ipAddress].flows).filter(_flow => _flow.flow == 'INBOUND').length >= Number(process.env.THRESHOLD_FLOW)) {
+                                console.log(`## DDoS Detected | ${ _ipAddress } | Reason : flow threshold reached`)
+                                attacks[new Date().toISOString()] = {
+                                    method: 'FLOW_THRESHOLD',
+                                    target: _ipAddress,
+                                    startedDate: new Date(),
+                            
+                                    record: {
+                                        peakPPS: 0,
+                                        peakBPS: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for (const _attackId of Object.keys(attacks)) {
+                        switch (attacks[_attackId].method) {
+                            case 'FLOW_THRESHOLD':
+                                if(Object.values(packet[attacks[_attackId].target].flows).filter(_flow => _flow.flow == 'INBOUND').length <= Number(process.env.THRESHOLD_FLOW) / 2) {
+                                    console.log(`## DDoS Ended | ${ attacks[_attackId].target }`)
+                                    attacks[_attackId] = undefined
+                                }
+                                break
+                        }
+                    }
                     packet = {  }
                 } catch(_error) {
                     console.log(_error)

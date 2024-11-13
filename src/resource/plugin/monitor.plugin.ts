@@ -204,7 +204,7 @@ export default {
             }
         }
         const _pcaketCapture = monitorPlugin.PacketCapture(_interface, (_packet) => {
-            _processFlow(_packet.flow, _packet.subpackets ? _packet.subpackets[_packet.subpackets.length =- 1] : _packet)
+            _processFlow(_packet.flow, _packet.protocolName !== 'ICMP' && _packet.subpackets.length !== 0 ? _packet.subpackets[_packet.subpackets.length =- 1] : _packet)
         })
         setInterval(() => {
             _callback(_flows, new Date())
