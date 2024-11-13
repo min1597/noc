@@ -154,7 +154,7 @@ export default {
                 try {
                     for (const _ipAddress of Object.keys(packet)) {
                         if(Object.values(attacks).filter(_attack => _attack.method == 'FLOW_THRESHOLD' && _attack.target == _ipAddress).length == 0) {
-                            if((Object.values(packet[_ipAddress].flows) ?? [  ]).filter(_flow => _flow.flow == 'INBOUND').length >= Number(process.env.THRESHOLD_FLOW)) {
+                            if((Object.values(packet[_ipAddress]?.flows) ?? [  ]).filter(_flow => _flow.flow == 'INBOUND').length >= Number(process.env.THRESHOLD_FLOW)) {
                                 console.log(`## DDoS Detected | ${ _ipAddress } | Reason : flow threshold reached`)
                                 attacks[new Date().toISOString()] = {
                                     method: 'FLOW_THRESHOLD',
@@ -170,11 +170,15 @@ export default {
                         }
                     }
                     for (const _attackId of Object.keys(attacks)) {
+                        attacks[_attackId].record.peakBPS = packet[attacks[_attackId].target].inboundTraffic >= attacks[_attackId].record.peakBPS ? packet[attacks[_attackId].target].inboundTraffic : attacks[_attackId].record.peakBPS
+                        attacks[_attackId].record.peakPPS = packet[attacks[_attackId].target].inboundPacket >= attacks[_attackId].record.peakPPS ? packet[attacks[_attackId].target].inboundPacket : attacks[_attackId].record.peakPPS
                         switch (attacks[_attackId].method) {
                             case 'FLOW_THRESHOLD':
-                                if((Object.values(packet[attacks[_attackId].target].flows) ?? [  ]).filter(_flow => _flow.flow == 'INBOUND').length <= Number(process.env.THRESHOLD_FLOW) / 2) {
+                                if((Object.values(packet[attacks[_attackId].target]?.flows) ?? [  ]).filter(_flow => _flow.flow == 'INBOUND').length <= Number(process.env.THRESHOLD_FLOW) / 2) {
                                     console.log(`## DDoS Ended | ${ attacks[_attackId].target }`)
                                     delete attacks[_attackId]
+                                } else {
+                                    console.log(`## DDoS is on going | ${ attacks[_attackId].target } | Peak BPS : ${ attacks[_attackId].record.peakBPS } | Peak PPS : ${ attacks[_attackId].record.peakPPS }`)
                                 }
                                 break
                         }
