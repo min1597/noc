@@ -50,7 +50,6 @@ export default {
     measure: async function () {
         try {
             monitorPlugin.PacketCapture('enp1s0', _rawPacket => {
-                console.log(_rawPacket.flow)
                 try {
                     const _ipAddress =
                         _rawPacket.subpackets.length == 0
@@ -118,7 +117,7 @@ export default {
             })
             setInterval(async () => {
                 try {
-                    console.log(packet)
+                    console.log(JSON.stringify(packet))
                     packet = {  }
                 } catch(_error) {
                     console.log(_error)
