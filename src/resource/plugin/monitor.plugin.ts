@@ -36,11 +36,10 @@ export default {
         }>
     }) => void): { success: true } | { success: false, error?: Error } => {
         try {
-            // const _xdpdump = child.spawn('xdpdump', ['-i', _interface, '-w', '-'])
-            // const _inboundTcpdump = child.spawn('tcpdump', ['-r', '-', '-n', '-vv'])
-            const _inboundTcpdump = child.spawn('tcpdump', ['-i', _interface, '-Q', 'in', '-n', '-vv'])
+            const _xdpdump = child.spawn('xdpdump', ['-i', _interface, '-w', '-'])
+            const _inboundTcpdump = child.spawn('tcpdump', ['-r', '-', '-n', '-vv'])
             const _outboundTcpdump = child.spawn('tcpdump', ['-i', _interface, '-Q', 'out', '-n', '-vv'])
-            // _xdpdump.stdout.pipe(_inboundTcpdump.stdin)
+            _xdpdump.stdout.pipe(_inboundTcpdump.stdin)
 
             let _packetCache = ''
             function _flagParser (_flag: string): Array<'SYN' | 'FIN' | 'RST' | 'PSH' | 'URG' | 'ECE' | 'CWR' | 'NS' | 'ACK' | 'DONT_FRAGMENTS' | 'MORE_FRAGMENTS'> {
