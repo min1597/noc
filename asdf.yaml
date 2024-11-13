@@ -1,0 +1,17 @@
+network:
+  version: 2
+  tunnels:
+    gre-local01:
+      mode: gre
+      local: local-ip
+      remote: remote-ip
+      addresses:
+        - asdf-ip
+      mtu: 1400
+    gre-local02:
+      mode: gre
+      local: local-ip
+      remote: remote-ip
+      addresses:
+        - asdf-ip
+      mtu: 1400
