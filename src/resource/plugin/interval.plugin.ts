@@ -201,7 +201,7 @@ export default {
                         }
                         switch (attacks[_attackId].method) {
                             case AttackMethod.FLOW_THRESHOLD:
-                                if((Object.values(packet[attacks[_attackId].target]?.flows) ?? [  ]).filter(_flow => _flow.flow == 'INBOUND').length <= Number(process.env.THRESHOLD_FLOW) * 0.9) {
+                                if((Object.values(packet[attacks[_attackId].target]?.flows ?? {  }) ?? [  ]).filter(_flow => _flow.flow == 'INBOUND').length <= Number(process.env.THRESHOLD_FLOW) * 0.9) {
                                     await getDatabaseClient().manager.getRepository(Attack).update({ uuid: _attackId }, { peak_bps: attacks[_attackId].record.peakBPS, peak_pps: attacks[_attackId].record.peakPPS, status: AttackStatus.Mitigated })
                                     for (const _firewallRuleId of attacks[_attackId].firewallRules) {
                                         await getDatabaseClient().manager.getRepository(Firewall).update({ uuid: _firewallRuleId }, { is_active: false, deleted_date: new Date() })
