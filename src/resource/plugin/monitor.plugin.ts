@@ -44,7 +44,6 @@ export default {
 
             let _packetCache = ''
             function _flagParser (_flag: string): Array<'SYN' | 'FIN' | 'RST' | 'PSH' | 'URG' | 'ECE' | 'CWR' | 'NS' | 'ACK' | 'DONT_FRAGMENTS' | 'MORE_FRAGMENTS'> {
-                console.log(_flag)
                 const _flagMap = {
                     S: 'SYN',
                     F: 'FIN',
@@ -58,9 +57,8 @@ export default {
                     DF: 'DONT_FRAGMENTS',
                     MF: 'MORE_FRAGMENTS'
                 }
-                const _parsedFlags = _flag.match(/\b\w+\b/g) || [  ]
-                console.log(_parsedFlags.map((_flag: string) => _flagMap[_flag] || _flag))
-                return _parsedFlags.map((_flag: string) => _flagMap[_flag] || _flag)
+                const _parsedFlags = _flag.split('') || [  ]
+                return _parsedFlags.filter(_flag => _flag !== 'F').map((_flag: string) => _flagMap[_flag] || _flag)
             }
             function _packetParser (_bufferData: Buffer, _flow: 'INBOUND' | 'OUTBOUND') {
                 const _packets: Array<string> = _bufferData.toString().replace(/\n +/gi, ' ').replace(/\n\t/gi, ' ').replace(/ +/gi, ' ').split('\n')
