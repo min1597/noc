@@ -159,7 +159,7 @@ export default {
                             if(process.env.WHITELIST_IP.split(',').includes(_ipAddress) == false) {
                                 if((Object.values(packet[_ipAddress]?.flows) ?? [  ]).filter(_flow => _flow.flow == 'INBOUND').length >= Number(process.env.THRESHOLD_FLOW)) {
                                     const _Firewall = new Firewall()
-                                    _Firewall.description = _ipAddress
+                                    _Firewall.destination_cidr = _ipAddress
                                     _Firewall.action = ActionType.DROP
                                     _Firewall.description = 'Flow threshold reached'
                                     _Firewall.server_id = process.env.SERVER_ID
