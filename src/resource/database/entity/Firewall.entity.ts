@@ -12,20 +12,20 @@ export class Firewall {
     uuid: string & { __brand: 'UUID' }
 
 
-    @Column({ type: 'text', nullable: false, comment: 'Source CIDR' })
-    source_cidr: string
+    @Column({ type: 'text', nullable: true, default: null, comment: 'Source CIDR' })
+    source_cidr: string | null
 
     @Column({ type: 'int', nullable: true, default: null, comment: 'Source port' })
     source_port: number | null
 
-    @Column({ type: 'text', nullable: false, comment: 'Destination CIDR' })
-    destination_cidr: string
+    @Column({ type: 'text', nullable: true, default: null, comment: 'Destination CIDR' })
+    destination_cidr: string | null
 
     @Column({ type: 'int', nullable: true, default: null, comment: 'Destination port' })
     destination_port: number | null
 
-    @Column({ type: 'enum', enum: Protocol, array: true, nullable: false, comment: 'Protocol' })
-    protocol: Array<Protocol>
+    @Column({ type: 'enum', enum: Protocol, array: true, nullable: true, default: null, comment: 'Protocol' })
+    protocol: Array<Protocol> | null
 
     @Column({ type: 'enum', enum: ActionType, nullable: false, default: ActionType.FILTER, comment: 'Action type' })
     action: ActionType
@@ -33,7 +33,13 @@ export class Firewall {
     @Column({ type: 'text', nullable: false, comment: 'Rule description' })
     description: string
 
+    @Column({ type: 'text', nullable: false, comment: 'Server ID' })
+    server_id: string
 
+
+    @Column({ type: 'boolean', default: true, comment: 'Data validity' })
+    is_active: boolean
+    
     @CreateDateColumn({ type: 'timestamptz', comment: 'Creation date' })
     created_date: Date
 
