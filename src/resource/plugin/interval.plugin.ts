@@ -26,6 +26,12 @@ let packet: {
                 inboundTraffic: number,
                 outboundPacket: number,
                 outboundTraffic: number
+            },
+            icmp: {
+                inboundPacket: number,
+                inboundTraffic: number,
+                outboundPacket: number,
+                outboundTraffic: number
             }
         }
     }
@@ -82,6 +88,12 @@ export default {
                                     inboundTraffic: 0,
                                     outboundPacket: 0,
                                     outboundTraffic: 0
+                                },
+                                icmp: {
+                                    inboundPacket: 0,
+                                    inboundTraffic: 0,
+                                    outboundPacket: 0,
+                                    outboundTraffic: 0
                                 }
                             }
                         }
@@ -107,6 +119,10 @@ export default {
                         case 'UDP':
                             packet[_ipAddress].record.udp[{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
                             packet[_ipAddress].record.udp[{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
+                            break
+                        case 'ICMP':
+                            packet[_ipAddress].record.icmp[{ 'INBOUND': 'inboundPacket', 'OUTBOUND': 'outboundPacket' }[_rawPacket.flow]] ++
+                            packet[_ipAddress].record.icmp[{ 'INBOUND': 'inboundTraffic', 'OUTBOUND': 'outboundTraffic' }[_rawPacket.flow]] += _rawPacket.size
                             break
                     }
                 } catch(_error) {

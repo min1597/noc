@@ -69,7 +69,6 @@ export default {
                     .filter(_packet => _packet.match(/IP \(tos [A-Za-z0-9]+,(ECT\(0\),)? ttl [0-9]+, id [0-9]+, offset [0-9]+, flags \[[A-Za-z,]+\], proto [A-Za-z]+ \([0-9]+\), length [0-9]+\) \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})? > \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?: (\[[^\]]*\])?( )?[A-Za-z0-9]+(\,)? (Flags \[[^\]]*\])?(\[[[A-Za-z.]+\])?(\, cksum [A-Za-z0-9]+)?( \([^)]*\),)?( seq [\d]+(\:[\d]+)?,)?( ack [\d]+,)?( win [\d]+,)?( (options \[[A-Za-z0-9, ]+\])?)?([^*] )?(length \d+)?/gi) !== null)
                     .filter(_packet => typeof _packet == 'string')
                     .map(_packet => {
-                        
                         const _connectedPacket = _packet.split(' ').length <= 17 ? `${ _packetCache } ${ _packet }` : _packet
                         const _decodedPacket = _connectedPacket.match(/IP \(tos [A-Za-z0-9]+,(ECT\(0\),)? ttl [0-9]+, id [0-9]+, offset [0-9]+, flags \[[A-Za-z,]+\], proto [A-Za-z]+ \([0-9]+\), length [0-9]+\) \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})? > \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?: (\[[^\]]*\])?( )?[A-Za-z0-9]+(\,)? (Flags \[[^\]]*\])?(\[[[A-Za-z.]+\])?(\, cksum [A-Za-z0-9]+)?( \([^)]*\),)?( seq [\d]+(\:[\d]+)?,)?( ack [\d]+,)?( win [\d]+,)?( (options \[[A-Za-z0-9, ]+\])?)?([^*] )?(length \d+)?/gi)
                         const _mainIpAddresses = _decodedPacket[0].match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})? > \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/)[0]
