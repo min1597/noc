@@ -56,7 +56,7 @@ export default {
                             ? _rawPacket[{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]]
                             : _rawPacket.subpackets[_rawPacket.subpackets.length - 1][{ 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow]]
                     console.log(`${ _rawPacket.sourceIpAddress } -(${ _rawPacket.flow })-> ${ _rawPacket.destinationIpAddress }`)
-                    console.log(`[${ _rawPacket.flow }] ${ _ipAddress }`)
+                    console.log(`[${ { 'INBOUND': 'destinationIpAddress', 'OUTBOUND': 'sourceIpAddress' }[_rawPacket.flow] }] ${ _ipAddress }`)
                     const _packet = 
                         _rawPacket.subpackets.length == 0
                             ? _rawPacket
