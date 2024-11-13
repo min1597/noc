@@ -85,7 +85,7 @@ export default {
                             sourcePort: _mainIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/g)[0].split('.').length == 5 ? Number(_mainIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/g)[0].split('.')[4]) : undefined,
                             destinationIpAddress: _mainIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}/g)[1],
                             destinationPort: _mainIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/g)[1].split('.').length == 5 ? Number(_mainIpAddresses.match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/g)[1].split('.')[4]) : undefined,
-                            flags: _flagParser(_decodedPacket[0].match(/Flags \[([^\]]+)\]/)[1].match(/[A-Za-z.]+/)[0]),
+                            flags: _decodedPacket[0].match(/Flags \[([^\]]+)\]/) ? _flagParser(_decodedPacket[0].match(/Flags \[([^\]]+)\]/)[1].match(/[A-Za-z.]+/)[0]) : [  ],
                             subpackets: _decodedPacket.filter(_packet => _decodedPacket[0].match(/id [\d]+/)[0].match(/[\d]+/)[0] !== _packet.match(/id [\d]+/)[0].match(/[\d]+/)[0]).map(_packet => {
                                 const _subIpAddresses = _packet.match(/\b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})? > \b(?:\d{1,3}\.){3}\d{1,3}(.\d{1,5})?/)[0]
                                 return {

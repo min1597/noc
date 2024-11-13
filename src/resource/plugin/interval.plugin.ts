@@ -49,7 +49,7 @@ export default {
 
     measure: async function () {
         try {
-            monitorPlugin.PacketCapture('en0', _rawPacket => {
+            monitorPlugin.PacketCapture('enp1s0', _rawPacket => {
                 console.log(_rawPacket.flow)
                 try {
                     const _ipAddress =
