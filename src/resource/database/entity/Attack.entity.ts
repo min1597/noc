@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
+export enum AttackFlow { INBOUND = 'INBOUND', OUTBOUND = 'OUTBOUND' }
 export enum AttackMethod { SYN_FLOOD = 'SYN_FLOOD', 'ACK_FLOOD' = 'ACK_FLOOD', 'UDP_FLOOD' = 'UDP_FLOOD', 'HIGH_PPS' = 'HIGH_PPS', 'FLOW_THRESHOLD' = 'FLOW_THRESHOLD', 'UNKNOWN' = 'UNKNOWN' }
 export enum AttackStatus { Mitigating = 'Mitigating', Mitigated = 'Mitigated' }
 @Entity()
@@ -10,6 +11,9 @@ export class Attack {
     @PrimaryGeneratedColumn('uuid', { comment: 'Row ID' })
     uuid: string & { __brand: 'UUID' }
 
+
+    @Column({ type: 'enum', enum: AttackFlow, nullable: false, default: AttackFlow, comment: 'Attack flow' })
+    flow: AttackFlow
 
     @Column({ type: 'text', nullable: false, comment: 'Target IP Address' })
     target_ip_address: string

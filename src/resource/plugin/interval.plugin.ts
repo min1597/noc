@@ -1,4 +1,4 @@
-import { Attack, AttackMethod, AttackStatus } from '../database/entity/Attack.entity'
+import { Attack, AttackFlow, AttackMethod, AttackStatus } from '../database/entity/Attack.entity'
 import { ActionType, Firewall } from '../database/entity/Firewall.entity'
 import { getDatabaseClient } from '../database/main'
 import firewallPlugin from './firewall.plugin'
@@ -157,18 +157,28 @@ export default {
                     for (const _ipAddress of Object.keys(packet)) {
                         if(Object.values(attacks).filter(_attack => _attack.method == AttackMethod.FLOW_THRESHOLD && _attack.target == _ipAddress).length == 0) {
                             if(process.env.WHITELIST_IP.split(',').includes(_ipAddress) == false) {
-                                if((Object.values(packet[_ipAddress]?.flows) ?? [  ]).filter(_flow => _flow.flow == 'INBOUND').length >= Number(process.env.THRESHOLD_FLOW)) {
+                                const _flows = (Object.values(packet[_ipAddress]?.flows) ?? [  ])
+                                if(
+                                    _flows.filter(_flow => _flow.flow == 'INBOUND').length >= Number(process.env.THRESHOLD_FLOW)
+                                    || _flows.filter(_flow => _flow.flow == 'OUTBOUND').length >= Number(process.env.THRESHOLD_FLOW)
+                                ) {
                                     const _Firewall = new Firewall()
-                                    _Firewall.destination_cidr = _ipAddress
+                                    const _Attack = new Attack()
+                                    if(_flows.filter(_flow => _flow.flow == 'INBOUND').length >= Number(process.env.THRESHOLD_FLOW)) {
+                                        _Firewall.destination_cidr = _ipAddress
+                                        _Attack.flow = AttackFlow.INBOUND
+                                    } else if(_flows.filter(_flow => _flow.flow == 'OUTBOUND').length >= Number(process.env.THRESHOLD_FLOW)) {
+                                        _Firewall.source_cidr = _ipAddress
+                                        _Attack.flow = AttackFlow.OUTBOUND
+                                    }
                                     _Firewall.action = ActionType.DROP
                                     _Firewall.description = 'Flow threshold reached'
                                     _Firewall.server_id = process.env.SERVER_ID
     
                                     const _firewall = await getDatabaseClient().manager.save(_Firewall)
     
-                                    firewallPlugin.XDP.addRule(_firewall.uuid, { destination: _firewall.destination_cidr }, {  }, 'DROP')
+                                    firewallPlugin.XDP.addRule(_firewall.uuid, { destination: _firewall.destination_cidr, source: _firewall.source_cidr }, {  }, 'DROP')
     
-                                    const _Attack = new Attack()
                                     _Attack.target_ip_address = _ipAddress
                                     _Attack.method = AttackMethod.FLOW_THRESHOLD
                                     _Attack.triggered_bps = packet[_ipAddress]?.inboundTraffic ?? 0
