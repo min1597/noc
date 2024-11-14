@@ -12,7 +12,7 @@ export class Attack {
     uuid: string & { __brand: 'UUID' }
 
 
-    @Column({ type: 'enum', enum: AttackFlow, nullable: false, default: AttackFlow, comment: 'Attack flow' })
+    @Column({ type: 'enum', enum: AttackFlow, nullable: false, default: AttackFlow.INBOUND, comment: 'Attack flow' })
     flow: AttackFlow
 
     @Column({ type: 'text', nullable: false, comment: 'Target IP Address' })
